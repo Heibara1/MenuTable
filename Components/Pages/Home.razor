@@ -1,0 +1,83 @@
+﻿@page "/"
+@using Azure.Data.Tables
+@using System.Collections.Generic
+@inject TableServiceClient TableServiceClient
+
+<PageTitle>Home</PageTitle>
+
+@code {
+    public class MenuItem
+
+    {
+        
+        public string Day { get; set; }
+
+        public string ColdDish { get; set; }
+
+        public string HotDish { get; set; }
+
+         
+
+    }
+
+
+    
+    private List<MenuItem> Menu = new List<MenuItem>();
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        // ConnectionString og tabellenavn kan være sat i appsettings.json og injiceres her.
+
+        var tableClient = TableServiceClient.GetTableClient("MenuTable");
+
+
+
+        await foreach (var entity in tableClient.QueryAsync<TableEntity>())
+
+        {
+
+            var menuItem = new MenuItem
+
+                {
+
+                    Day = entity.RowKey,
+
+                    ColdDish = entity.GetString("KoldRet"),
+
+                    HotDish = entity.GetString("VarmRet")
+
+
+
+                };
+
+            Menu.Add(menuItem);
+
+        }
+
+    }
+}
+<h3>Kantinemenu</h3>
+<table>
+    <tr>
+        <th>Dag</th>
+        <th>Kold ret</th>
+        <th>Varm ret</th>
+        <th>Menu</th>
+        <th>tid</th>
+    </tr>
+    @foreach (var item in Menu)
+
+    {
+        <tr>
+            <td>@item.Day</td>
+            <td>@item.ColdDish</td>
+            <td>@item.HotDish</td>
+            <td>@item.</td>
+
+        </tr>
+    }
+</table>
